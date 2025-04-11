@@ -1,0 +1,81 @@
+#%RAML 1.0
+title: User Management API
+version: v1
+baseUri: http://localhost:8081/api
+mediaType: application/json
+
+types:
+  User:
+    type: object
+    properties:
+      id?: string
+      nome: string
+      cognome: string
+      email: string
+      indirizzo: string
+
+/users:
+  get:
+    description: Ottiene tutti gli utenti
+    responses:
+      200:
+        body:
+          type: User[]
+  post:
+    description: Crea un nuovo utente
+    body:
+      application/json:
+        type: User
+    responses:
+      201:
+        body:
+          type: User
+
+  /search:
+    get:
+      description: Ricerca utenti per nome e/o cognome
+      queryParameters:
+        nome?: string
+        cognome?: string
+      responses:
+        200:
+          body:
+            type: User[]
+
+  /{id}:
+    uriParameters:
+      id: string
+    get:
+      description: Ottiene un utente per ID
+      responses:
+        200:
+          body:
+            type: User
+        404:
+          description: Utente non trovato
+
+    put:
+      description: Aggiorna interamente un utente
+      body:
+        application/json:
+          type: User
+      responses:
+        200:
+          body:
+            type: User
+
+    patch:
+      description: Aggiorna parzialmente un utente
+      body:
+        application/json:
+          type: object
+      responses:
+        200:
+          body:
+            type: User
+
+    delete:
+      description: Cancella un utente per ID
+      responses:
+        204:
+          description: Nessun contenuto
