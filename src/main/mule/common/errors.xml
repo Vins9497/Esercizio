@@ -85,4 +85,32 @@ output application/json
                 </ee:transform>
             </on-error-propagate>
 	</error-handler>
+	<error-handler name="HTTP_Error" doc:id="12e9a6f0-cfa2-4a9d-bb48-b493b3be06be" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="be4e4744-b023-4cf6-a942-8108ba8ac7d7" type="HTTP:BAD_REQUEST" >
+			<ee:transform doc:name="Transform Message" doc:id="caf68193-87be-41c1-961c-6584af20a0fb" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[400]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="81fa6212-51d7-4ee8-956c-7b2e15816253" type="HTTP:NOT_FOUND" >
+			<ee:transform doc:name="Transform Message" doc:id="05d33e3f-27cc-482d-babf-25931163c5ee" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[404]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+	</error-handler>
 </mule>
