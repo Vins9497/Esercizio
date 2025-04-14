@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="get-users-searchSub_Flow" doc:id="4cefc665-164e-4101-ada9-875c82bec391" >
+<set-variable variableName="baseQuery" value="#['SELECT * FROM users WHERE 1=1']" doc:name="Base query"/>
+    
+    <set-variable variableName="whereClause" value="#[(if ( (attributes.queryParams.nome default null) != null) ' AND LOWER(nome) LIKE LOWER(:nome)' else &quot;&quot;) ++&#10;(if( (attributes.queryParams.cognome default null) != null) ' AND LOWER(cognome) LIKE LOWER(:cognome)' else &quot;&quot; )]" doc:name="Check Nome and cognome"/>
+
+    <set-variable variableName="finalQuery" value="#[vars.baseQuery ++ vars.whereClause]" doc:name="Concatenation of dynamic query"/>
+
+    <db:select config-ref="Database_Config1">
+        <db:sql><![CDATA[#[vars.finalQuery]]]></db:sql>
+			<db:input-parameters ><![CDATA[#[output application/json
+---
+{
+	"nome": attributes.queryParams.nome,
+	"cognome": "nome": attributes.queryParams.cognome
+	
+}]]]></db:input-parameters>
+    </db:select>
+
+    <ee:transform doc:name="Map user search">
+        <ee:message>
+            <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map (user) -> {
+  id: user.id,
+  nome: user.nome,
+  cognome: user.cognome,
+  email: user.email,
+  indirizzo: user.indirizzo
+}]]></ee:set-payload>
+        </ee:message>
+    </ee:transform>
+	</sub-flow>
+</mule>

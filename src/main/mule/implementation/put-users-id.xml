@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="put-users-id" doc:id="4776108e-35fa-495a-a495-8f4901a31bac" >
+<ee:transform doc:name="Set query" doc:id="66ee6d39-566f-4a8e-998f-f714802f9b1c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+    id: vars.id,
+    nome: vars.body.nome,
+    cognome: vars.body.cognome,
+    email: vars.body.email,
+    indirizzo: vars.body.indirizzo
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    <db:update config-ref="Database_Config1">
+        <db:sql><![CDATA[
+            UPDATE users
+            SET nome = :nome, cognome = :cognome, email = :email, indirizzo = :indirizzo
+            WHERE id = :id;
+        ]]></db:sql>
+			<db:input-parameters ><![CDATA[#[output application/json
+---
+payload]]]></db:input-parameters>
+    </db:update>
+	</sub-flow>
+</mule>

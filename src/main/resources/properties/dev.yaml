@@ -1,0 +1,12 @@
+http:
+  
+  path: "/*"
+  host: "0.0.0.0"
+  
+  listener:
+    port: "8081"
+    protocol: "HTTP"
+
+db:
+  host: "lacalhost"
+  port: "1521"

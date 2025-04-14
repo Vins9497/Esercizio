@@ -1,0 +1,11 @@
+%dw 2.0
+
+type auto_4776108e_35fa_495a_a495_8f4901a31bac_Output_Payload = {
+  cognome: String, 
+  indirizzo: String, 
+  nome: String, 
+  id?: String, 
+  email: String, 
+  _?: Any
+}
+

@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_ee1cc5e9_e656_4d48_9dcc_11c3f7e2b436_Output_Payload = Array<{  cognome: String,   indirizzo: String,   nome: String,   id?: String,   email: String,   _?: Any}>
+

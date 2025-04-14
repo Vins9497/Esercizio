@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="patch-users-id" doc:id="6e6f763f-96af-4523-a8d3-9ac68f0ba52a" >
+
+    <db:select config-ref="Database_Config1">
+        <db:sql><![CDATA[SELECT * FROM users WHERE id = :id]]></db:sql>
+			<db:input-parameters ><![CDATA[#[output application/json
+---
+
+"id": vars.id]]]></db:input-parameters>
+
+    </db:select>
+
+    <set-variable variableName="existing" value="#[payload[0]]" doc:name="Retrive User"/>
+
+    <!-- Unione parziale tra payload ricevuto e dati attuali -->
+    <ee:transform doc:name="Set changes in user">
+        <ee:message>
+            <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+    id: vars.userId,
+    nome: vars.body.nome default vars.existing.nome,
+    cognome: vars.body.cognome default vars.existing.cognome,
+    email: vars.body.email default vars.existing.email,
+    indirizzo: vars.body.indirizzo default vars.existing.indirizzo
+}]]></ee:set-payload>
+        </ee:message>
+    </ee:transform>
+
+    <!-- Esegui update completo usando i dati uniti -->
+    <db:update config-ref="Database_Config1">
+        <db:sql><![CDATA[
+            UPDATE users
+            SET nome = :nome, cognome = :cognome, email = :email, indirizzo = :indirizzo
+            WHERE id = :id
+        ]]></db:sql>
+        <db:input-parameters><![CDATA[#[payload]]]></db:input-parameters>
+    </db:update>
+	</sub-flow>
+</mule>

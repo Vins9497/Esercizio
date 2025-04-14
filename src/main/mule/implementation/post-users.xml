@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<sub-flow name="post-users" doc:id="86b409ad-54ea-40bb-96da-315ace547435" >
+	
+	<ee:transform doc:name="Set query">
+        <ee:message>
+            <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    id: vars.body.id,
+    nome: vars.body.nome,
+    cognome: vars.body.cognome,
+    email: vars.body.email,
+    indirizzo: vars.body.indirizzo
+}]]></ee:set-payload>
+        </ee:message>
+    </ee:transform>
+    <db:insert config-ref="Database_Config1">
+        <db:sql><![CDATA[
+            INSERT INTO users (id, nome, cognome, email, indirizzo)
+            VALUES (:id, :nome, :cognome, :email, :indirizzo);
+        ]]></db:sql>
+        <db:input-parameters><![CDATA[#[payload]]]></db:input-parameters>
+    </db:insert>
+		<ee:transform doc:name="Set httpStatus" doc:id="2727ede5-5f08-490f-a705-ab7751927cd6" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="httpStatus" ><![CDATA[201]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+
+</mule>
