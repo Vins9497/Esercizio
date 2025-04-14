@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<sub-flow name="get-users-id" doc:id="f8c5bac5-ef89-4b36-8f54-791717cd3131" >
+		<db:select config-ref="Database_Config1" doc:name="Select Single User">
+        <db:sql><![CDATA[SELECT * FROM users WHERE id = :id;]]></db:sql>
+			<db:input-parameters ><![CDATA[#["id": vars.id]]]></db:input-parameters>
+    </db:select>
+    <choice doc:name="User exist?">
+        <when expression="#[isEmpty(payload)]">
+				<raise-error doc:name="USER:NOT_FOUND" doc:id="f61299eb-3431-4d53-90a1-63128fa7bdf5" type="USER:NOT_FOUND" description='"Utente non trovato"'/>
+        </when>
+			<otherwise>
+            <ee:transform doc:name="Return User">
+                <ee:message>
+                    <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload[0] mapObject ((value, key) -> (key): value)]]></ee:set-payload>
+                </ee:message>
+            </ee:transform>
+        </otherwise>
+    </choice>
+	</sub-flow>
+</mule>

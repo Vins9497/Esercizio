@@ -1,0 +1,11 @@
+%dw 2.0
+
+type auto_f8c5bac5_ef89_4b36_8f54_791717cd3131_Output_Payload = {
+  cognome: String, 
+  indirizzo: String, 
+  nome: String, 
+  id?: String, 
+  email: String, 
+  _?: Any
+}
+
