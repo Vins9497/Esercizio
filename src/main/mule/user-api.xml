@@ -17,12 +17,14 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
         </error-handler>
     </flow>
     <flow name="put:\users\(id):application\json:user-api-config">
-        <ee:transform doc:name="Transform Message">
+        <ee:transform doc:name="Set input variable">
             <ee:variables>
-                <ee:set-variable variableName="id">attributes.uriParams.'id'</ee:set-variable>
+                <ee:set-variable variableName="id"><![CDATA[attributes.uriParams.'id']]></ee:set-variable>
+				<ee:set-variable variableName="body" ><![CDATA[payload]]></ee:set-variable>
             </ee:variables>
         </ee:transform>
-        <logger level="INFO" message="put:\users\(id):application\json:user-api-config" />
+		<flow-ref doc:name="put-users-id" doc:id="2aa3b86e-a89f-49f3-a2e8-22aca7d0017c" name="put-users-id"/>
+		<error-handler ref="HTTP_Error" />
     </flow>
     <flow name="delete:\users\(id):user-api-config">
         <ee:transform doc:name="Transform Message">
@@ -33,12 +35,16 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
         <logger level="INFO" message="delete:\users\(id):user-api-config" />
     </flow>
     <flow name="patch:\users\(id):application\json:user-api-config">
-        <ee:transform doc:name="Transform Message">
+        <ee:transform doc:name="Set variables">
             <ee:variables>
-                <ee:set-variable variableName="id">attributes.uriParams.'id'</ee:set-variable>
+                <ee:set-variable variableName="id"><![CDATA[attributes.uriParams.'id']]></ee:set-variable>
+				<ee:set-variable variableName="body" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
             </ee:variables>
         </ee:transform>
-        <logger level="INFO" message="patch:\users\(id):application\json:user-api-config" />
+		<flow-ref doc:name="patch-users-id" doc:id="0baf87fd-282a-4bf9-a1a3-a5107af29bce" name="patch-users-id"/>
     </flow>
     <flow name="get:\users\search:user-api-config">
         <logger level="INFO" message="get:\users\search:user-api-config" />
@@ -57,6 +63,14 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 		<error-handler ref="HTTP_Error" />
     </flow>
     <flow name="post:\users:application\json:user-api-config">
-        <logger level="INFO" message="post:\users:application\json:user-api-config" />
+		<ee:transform doc:name="Set Input Payload" doc:id="674a9917-1ed0-4b25-9996-1eb0c7d0e6b8" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="body" ><![CDATA[payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="post-users" doc:id="df4d52d0-42b5-4e5e-beb6-b977ea32a9b3" name="post-users"/>
+		<error-handler ref="HTTP_Error" />
     </flow>
 </mule>
